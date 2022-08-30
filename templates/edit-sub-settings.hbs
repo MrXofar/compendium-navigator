@@ -1,0 +1,37 @@
+<form>
+
+    <div class="compnav-display-none">
+        <div>Setting1_value   :{{Setting1_value}}</div>
+        <div>Setting2_value   :{{Setting2_value}}</div>
+    </div> 
+
+    {{!-- Setting1 --}}
+    <div class="compnav-form-group">
+        <label><span>{{localize "CompNav.settings.Setting1.Name"}}</span></label>
+        <div class="compnav-form-fields">
+            <select name="newmodulename_Setting1" class="compnav-select">
+                {{selectOptions Setting1_choices selected=Setting1_value localized=true}}
+            </select>
+        </div>
+        <p class="notes">{{localize "CompNav.settings.Setting1.Hint"}}</p>
+    </div>
+
+    {{!-- Setting2 --}}
+    <div class="compnav-form-group">
+        <label><span>{{localize "CompNav.settings.Setting2.Name"}}</span></label>
+        <div class="compnav-form-fields">
+            <input type="checkbox" name="newmodulename_Setting2" value="{{Setting2_value}}" data-dtype="Boolean" {{checked Setting2_value}}>
+        </div>
+        <p class="notes">{{localize "CompNav.settings.Setting2.Hint"}}</p>
+    </div>
+    
+    {{!-- Save || Cancel --}}
+    <div class="rncs-flex-row">
+        <button type="submit" id="submit">
+            <i class="fa fa-save"></i> Save Changes
+        </button>
+        <button type="cancel" id="cancel" data-cancel>
+            <i class="fa fa-ban"></i> Cancel
+        </button>
+    </div>
+</form>

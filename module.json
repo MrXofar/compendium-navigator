@@ -1,0 +1,27 @@
+{
+    "name": "compendium-navigator",
+    "title": "Compendium Navigator",
+    "description": "Compendium Navigator Description",
+    "author": "Richard Fox",
+    "version": "0.0.1",
+    "minimumCoreVersion": "0.8.6",
+    "compatibleCoreVersion" : "9",
+    "changelog": "",
+    "styles":["styles/compendium-navigator-styles.css"],
+    "systems": [], 
+    "esmodules": [
+      "scripts/main.js"
+    ], 
+    "languages": [
+      {
+        "lang": "en",
+        "name": "English",
+        "path": "lang/en.json"
+      }
+    ],
+    "manifest": "https://raw.githubusercontent.com/MrXofar/compendium-navigator/master/module.json",
+    "download": "https://github.com/MrXofar/compendium-navigator/archive/refs/tags/v0.0.1.zip",
+    "url": "https://github.com/MrXofar/compendium-navigator",
+    "readme": "https://github.com/MrXofar/compendium-navigator/blob/master/README.md",
+    "bugs": "https://github.com/MrXofar/compendium-navigator/issues"
+  }
