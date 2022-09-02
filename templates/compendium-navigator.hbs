@@ -39,7 +39,7 @@
                     if (is_child && typeof (value) !== "object") { field_label.classList.add("compnav-filter-child-label"); }
 
                     let field_span = document.createElement("span");
-                    field_span.textContent = key;
+                    field_span.textContent = (!is_child ? "data." : "." ) + key;
                     field_label.appendChild(field_span);
                     let h3 = null;
                     if (!is_child || typeof (value) === "object") { 
@@ -58,7 +58,7 @@
                     //    //parent_filter_container.appendChild(br);
                     //    parent_filter_container.appendChild(field_label);
                     //}
-
+                    let data_root_key = "data." + root + key
                     if (typeof (value) !== "object") {
                         let field_container = document.createElement("div");
                         field_container.classList.add("compnav-form-fields");
@@ -68,14 +68,14 @@
                         switch (value) {
                             case 'string':
                                 field_filter.setAttribute("type", "text")
-                                if (filter_selections["data." + root + key] !== undefined) {
-                                    field_filter.value = filter_selections["data." + root + key];
+                                if (filter_selections[data_root_key] !== undefined) {
+                                    field_filter.value = filter_selections[data_root_key];
                                 }
                                 break;
                             case 'boolean':
                                 field_filter.setAttribute("type", "checkbox");
-                                if (filter_selections["data." + root + key] !== undefined) {
-                                    if(Boolean(filter_selections["data." + root + key]))
+                                if (filter_selections[data_root_key] !== undefined) {
+                                    if(Boolean(filter_selections[data_root_key]))
                                     {
                                         field_filter.checked = true;
                                     }
@@ -83,17 +83,24 @@
                                 break;
                             case 'number':
                                 field_filter.setAttribute("type", "number")
-                                if (filter_selections["data." + root + key] !== undefined) {
-                                    field_filter.value = filter_selections["data." + root + key];
+                                if (filter_selections[data_root_key] !== undefined) {
+                                    field_filter.value = filter_selections[data_root_key];
                                 }
                                 break;
                             default:
+                                field_filter.setAttribute("type", "text");
+                                field_filter.removeAttribute("placeholder");
+                                field_filter.setAttribute("placeholder", "unknown");
+                                field_filter.disabled = true;
+
+                                break;
                         }
 
-                        field_filter.setAttribute("name", "data." + root + key);
+                        field_filter.setAttribute("name", data_root_key);
                         field_container.appendChild(field_filter)
 
                         //if (!parent_filter_container) {
+                        filter_container.setAttribute("title", data_root_key);
                         filter_container.appendChild(field_container);
                         div_compnav_fields.appendChild(filter_container);
                         //} 
@@ -105,6 +112,7 @@
                     else {
                         if (Object.keys(value).length > 0) {                    
                             //if (!parent_filter_container) {
+                            filter_container.setAttribute("title", data_root_key);
                             div_compnav_fields.appendChild(filter_container);
                             BuildFilterControls(filter_selections, filter_fields_obj[key], true, root + key + ".");
                             //} 
@@ -131,6 +139,111 @@
                     }
                 }
             }
+        }
+        
+        function dragstart_handler(ev) {
+            ev.dataTransfer.setData("text/plain", ev.target.parentElement);        // id of element being dragged
+            ev.dataTransfer.setData("text/plain", ev.target.innerText); // value of element being dragged
+            {{!-- ev.dataTransfer.setData("text/plain", ev.target.title);        // id of element being dragged --}}
+            ev.dataTransfer.setData("text/plain", ev.target.id);        // id of element being dragged
+            ev.dataTransfer.dropEffect = "copy";
+        }
+
+        function dragover_handler(ev) {
+            console.log("Dragging over drop zone");
+            ev.preventDefault();
+            ev.dataTransfer.dropEffect = "copy";
+        }
+
+        async function drop_handler(ev) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text/plain");
+            const drop_item_id = document.getElementById(data).id
+            const drop_item_gpk = document.getElementById(data).title
+            const drop_zone = document.getElementById(ev.target.id);
+            console.log(drop_item_gpk);
+            console.log(drop_item_id);
+            console.log(drop_zone.id);
+
+            let pack = game.packs.get(drop_item_gpk);
+            let item = await pack.getDocument(drop_item_id);
+            console.log(item);
+
+            // TODO: Farm out to function
+            // TODO: Check to see if item already selected
+            // TODO: Build html
+            
+            //let item_label = document.createElement("label");
+            //let br = document.createElement("br");
+            //item_label.textContent = item.data.name;
+            //drop_zone.appendChild(item_label);
+            //drop_zone.appendChild(br);
+
+            let div_item_selected_container = document.createElement("div");
+            div_item_selected_container.classList.add("compnav-flex-row");
+            div_item_selected_container.classList.add("compnav-filtered-result");
+            div_item_selected_container.id = "selected_item_" + drop_item_id;
+            div_item_selected_container.title = drop_item_gpk;
+            div_item_selected_container.setAttribute("data-game_pack_key", drop_item_gpk);
+            div_item_selected_container.setAttribute("data-document_id", drop_item_id);
+
+            let div_item_selected_img = document.createElement("div");
+            div_item_selected_img.classList.add("compnav-filtered-result-img");
+            let item_selected_img = document.createElement("img");
+            item_selected_img.src = item.data.img;
+            item_selected_img.height = 48;
+            item_selected_img.width = 48;
+            div_item_selected_img.appendChild(item_selected_img);
+
+            let div_item_selected_name = document.createElement("div");
+            div_item_selected_name.classList.add("compnav-filtered-result-name");
+            let h4 = document.createElement("h4");
+            let a = document.createElement("a");
+            a.innerText = item.data.name;
+            h4.appendChild(a);
+            div_item_selected_name.appendChild(h4);
+
+            div_item_selected_name.addEventListener("click", (event) => {
+                let item_id = drop_item_id;
+                let game_pack_key = drop_item_gpk;
+                let pack = game.packs.find(p => p.collection === game_pack_key);
+                this.ShowItem(pack, item_id);
+            });
+
+            div_item_selected_container.appendChild(div_item_selected_img);
+            div_item_selected_container.appendChild(div_item_selected_name);
+
+            if(item.data.data.source !== undefined){
+                let div_item_selected_source = document.createElement("div");
+                div_item_selected_source.classList.add("compnav-filtered-result-source");
+                let span = document.createElement("span");
+                span.innerText = item.data.data.source
+                div_item_selected_source.appendChild(span);
+                div_item_selected_container.appendChild(div_item_selected_source);
+            }
+
+            drop_zone.appendChild(div_item_selected_container);
+
+
+            //<div id="{{filter_results._id}}" class="compnav-flex-row compnav-filtered-result" title="{{filter_results.gpk}}" 
+            //data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}"
+            //draggable="true" ondragstart="dragstart_handler(event)">
+            //    <div class="compnav-filtered-result-img">
+            //        <img src="{{filter_results.img}}" width="48" height="48" />
+            //    </div>
+            //    <div class="compnav-filtered-result-name">
+            //        <h4><a>{{filter_results.name}}</a></h4>
+            //    </div>
+            //    <div class="compnav-filtered-result-source">
+            //        <span>{{filter_results.data.source}}</span>
+            //    </div>
+            //</div>
+
+        }
+        
+        async function ShowItem(pack, item_id) {
+            let doc = await pack.getDocument(item_id);
+            doc.sheet.render(true);
         }
 
     </script>
@@ -192,20 +305,14 @@
                     </button>
                 <div class="compnav-filtered-result-source">
                     {{#each filter_selections as |filter_selections id|}}
-                    {{ id}}: {{filter_selections}}<br>
+                    <span>{{ id}}: {{filter_selections}}&nbsp;+</span>
                     {{/each}}
                 </div>
                     <p>
-                        <h3>Fields: (.data)</h3>
+                        <h3>Fields:</h3>
                     </p>
                 </div>
 
-                <textarea style="width: 100%;
-                                                        overflow-wrap: break-word;
-                                                        font-size: smaller;
-                                                        margin: 0px;
-                                                        height: 40px;
-                                                        border: none;">{{filter_fields_json}}</textarea>
                 <div class="compnav-form-group">
                     <label><h3><span>Name</span></h3></label>
                     <div class="compnav-form-fields">
@@ -214,21 +321,21 @@
                 </div>
             </div>
 
-            {{!-- <div class="compnav-form-filter">
-                <label><span>filter 1</span></label>
-                <div class="compnav-form-fields">
-                    <input type="checkbox" name="newmodulename_filter1" value="0" data-dtype="Boolean" {{checked
-                        Setting2_value}}>
-                </div>
-                <p class="notes">{{localize "CompNav.Filter.filter1.Hint"}}</p>
-            </div> --}}
+            {{!-- <textarea style="width: 100%;
+                overflow-wrap: break-word;
+                font-size: smaller;
+                margin: 0px;
+                height: 840px;
+                border: none;">{{filter_fields_json}}</textarea> --}}
 
         </div>
         
         <div class="compnav-form-column compnav-form-col-border">
             <h3>Results</h3>
             {{#each filter_results as |filter_results id|}}
-            <div class="compnav-flex-row compnav-filtered-result" title="{{filter_results.gpk}}" data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}">
+            <div id="{{filter_results._id}}" class="compnav-flex-row compnav-filtered-result" title="{{filter_results.gpk}}" 
+            data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}"
+            draggable="true" ondragstart="dragstart_handler(event)">
                 <div class="compnav-filtered-result-img">
                     <img src="{{filter_results.img}}" width="48" height="48" />
                 </div>
@@ -242,8 +349,9 @@
             {{/each}}
         </div>
 
-        <div class="compnav-form-column compnav-form-col-border">
+        <div id="Selected_Item_Drop_Zone" class="compnav-form-column compnav-form-col-border" ondrop="drop_handler(event)" ondragover="dragover_handler(event)">
             <h3>Selected</h3>
+            
         </div>
     </div>
 
