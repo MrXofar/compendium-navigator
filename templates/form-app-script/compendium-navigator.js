@@ -217,25 +217,25 @@ export class CompendiumNavigator extends FormApplication {
         //console.log(index);
         for (const item of index) {
             //console.log("=== GetFields BEGIN === ")
-            //console.log(item.data);
+            //console.log(item);
             this._temp_index_loop_count += 1;
-            parent_props = parent_props.concat(Object.keys(item.data).filter(x => !parent_props.includes(x)));
+            parent_props = parent_props.concat(Object.keys(item).filter(x => !parent_props.includes(x)));
             for (const prop of parent_props) {
-                if (item.data[prop] !== undefined) {
+                if (item[prop] !== undefined) {
 
-                    //console.log(prop + " : value(" + (item.data[prop] === null ? "null" : item.data[prop]) + ")");
+                    //console.log(prop + " : value(" + (item[prop] === null ? "null" : item[prop]) + ")");
 
-                    if (item.data[prop] != null && typeof (item.data[prop]) === 'object' && Object.keys(item.data[prop]).length > 0) {
+                    if (item[prop] != null && typeof (item[prop]) === 'object' && Object.keys(item[prop]).length > 0) {
                         //console.log("Getting child fields for parent property " + prop + " as type of " + typeof (this._document_index_keys[prop]));
                         if (this._document_index_keys[prop] === undefined) {
                             this._document_index_keys[prop] = {};
                         }
                         this.GetChildFields(item, prop);
 
-                    } else if (typeof (item.data[prop]) !== 'object') {
+                    } else if (typeof (item[prop]) !== 'object') {
                         //console.log(prop + " is a childless top level property.");
                         if (this._document_index_keys[prop] === undefined) {
-                            this._document_index_keys[prop] = typeof (item.data[prop]);
+                            this._document_index_keys[prop] = typeof (item[prop]);
                         }
                     }
                 }
@@ -249,22 +249,22 @@ export class CompendiumNavigator extends FormApplication {
 
         //console.log(">>> GetChildFields BEGIN >>> ");
         let child_properties = null;
-        if (getProperty(item.data, prop) != null) {
-            child_properties = Object.keys(getProperty(item.data, prop));
+        if (getProperty(item, prop) != null) {
+            child_properties = Object.keys(getProperty(item, prop));
             //console.log("child_properties of..." + prop);
-            //console.log(getProperty(item.data, prop));
+            //console.log(getProperty(item, prop));
             //console.log("are...");
             //console.log(child_properties);
         } //else { console.log(prop + " is null"); }
 
         for (const ckey of child_properties) {
 
-            //console.log("value of " + ckey + " is " + getProperty(item.data,prop)[ckey]);
-            //if (!Array.isArray(getProperty(item.data, prop)[ckey])) { // Skipping arrays for now.
+            //console.log("value of " + ckey + " is " + getProperty(item,prop)[ckey]);
+            //if (!Array.isArray(getProperty(item, prop)[ckey])) { // Skipping arrays for now.
             try {
-                if (getProperty(item.data, prop)[ckey] != null
-                    && typeof (getProperty(item.data, prop)[ckey]) === 'object'
-                    && Object.keys(getProperty(item.data, prop)[ckey]).length > 0) {
+                if (getProperty(item, prop)[ckey] != null
+                    && typeof (getProperty(item, prop)[ckey]) === 'object'
+                    && Object.keys(getProperty(item, prop)[ckey]).length > 0) {
 
                     //console.log(">> Getting child fields for... " + prop + "." + ckey);
                     //if (getProperty(this._document_index_keys,prop + "." + ckey) === undefined){console.log("and _document_index_keys." + prop + "." + ckey + " is undefined...");}
@@ -274,18 +274,18 @@ export class CompendiumNavigator extends FormApplication {
                     this.GetChildFields(item, prop + "." + ckey);
                     //console.log(">>");
 
-                } else if (getProperty(item.data, prop)[ckey] != null) {
+                } else if (getProperty(item, prop)[ckey] != null) {
                     //console.log("> " + prop + "." + ckey + " is a childless top level property.");
                     //if (getProperty(this._document_index_keys,prop + "." + ckey)  === undefined){console.log("and _document_index_keys." + prop + "." + ckey + " is undefined");}
                     if (getProperty(this._document_index_keys, prop)[ckey] === undefined) { 
                         //console.log("Setting typeof value for " + prop + "." + ckey);
-                        //console.log(prop + "." + ckey + " is typeof " + getProperty(item.data, prop)[ckey]);
-                        if(!Array.isArray(getProperty(item.data, prop)[ckey])){
-                            //console.log(typeof (getProperty(item.data, prop)[ckey]));
-                            getProperty(this._document_index_keys, prop)[ckey] = typeof (getProperty(item.data, prop)[ckey]);
+                        //console.log(prop + "." + ckey + " is typeof " + getProperty(item, prop)[ckey]);
+                        if(!Array.isArray(getProperty(item, prop)[ckey])){
+                            //console.log(typeof (getProperty(item, prop)[ckey]));
+                            getProperty(this._document_index_keys, prop)[ckey] = typeof (getProperty(item, prop)[ckey]);
                         } 
                         // else{                           
-                        //     getProperty(this._document_index_keys, prop)[ckey] = "array(" + getProperty(item.data, prop + "." + ckey) + ")";
+                        //     getProperty(this._document_index_keys, prop)[ckey] = "array(" + getProperty(item, prop + "." + ckey) + ")";
                         // }
                     }
                     //console.log(">");
@@ -304,7 +304,7 @@ export class CompendiumNavigator extends FormApplication {
         this._filter_selections = {};
         this._filter_results = [];
         this._filter_selections.type = this._class_types_selected[0];
-        let data_keys = Object.keys(formData).filter(data => formData[data] != null && formData[data] !== false && formData[data] !== "")
+        let data_keys = Object.keys(formData).filter(data => data !== "hdn_Selected_Items" && formData[data] != null && formData[data] !== false && formData[data] !== "")
         for (const key of data_keys) {
             this._filter_selections[key] = formData[key];
         }

@@ -35,7 +35,7 @@ Hooks.on('renderCompendiumDirectory', (app, html, data) => {
 async function VersionUpdateValidation() {
 
 	// Report current module.json version
-	let module_version = game.modules.get(CompNav.ID).data.version;
+	let module_version = game.modules.get(CompNav.ID).version;
 	console.log("CompNav | current module.json version:" + module_version);
 
 	// Report old version; game.settings.version.default === "0.0.0"

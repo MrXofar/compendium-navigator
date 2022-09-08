@@ -2,13 +2,12 @@
     "name": "compendium-navigator",
     "title": "Compendium Navigator",
     "description": "Compendium Navigator Description",
-    "author": "Richard Fox",
+    "authors": [{"name": "Richard Fox"}],
     "version": "0.0.1",
-    "minimumCoreVersion": "0.8.6",
-    "compatibleCoreVersion" : "9",
+    "compatibility" : {"minimum": "10", "verified":"10"},
     "changelog": "",
     "styles":["styles/compendium-navigator-styles.css"],
-    "systems": [], 
+    "relationships.systems": [], 
     "esmodules": [
       "scripts/main.js"
     ], 
