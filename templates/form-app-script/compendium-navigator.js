@@ -1,5 +1,5 @@
 
-import { RegisteredSettings } from "../../scripts/registered-settings.js";
+//import { RegisteredSettings } from "../../scripts/registered-settings.js";
 
 Hooks.on('renderCompendiumNavigator', () => {
     console.log("Compnav | renderCompendiumNavigator");
@@ -9,7 +9,7 @@ Hooks.on('renderCompendiumNavigator', () => {
 export class CompendiumNavigator extends FormApplication {
 
     // Properties
-    _settings = new RegisteredSettings;
+    //_settings = new RegisteredSettings;
     _doc_classes = ["Actor", "Item"] //, "JournalEntry", "Macro"
     _doc_class_selected = "Actor";
     _class_types = [];
@@ -193,7 +193,8 @@ export class CompendiumNavigator extends FormApplication {
         if (!this._mapped_fields.find(x => x.class_type === class_type)) {
             this._document_index_keys = {};
             for (const _gpk of this._game_pack_keys_selected) {
-                index = await game.packs.get(_gpk).getIndex({ fields: ["img", "data"] });
+                index = await game.packs.get(_gpk).getIndex({ fields: ["value", "system", "data"] });
+                console.log(index);
                 this.GetFields(index);
             }
             //console.log(this._document_index_keys);
@@ -217,7 +218,7 @@ export class CompendiumNavigator extends FormApplication {
         //console.log(index);
         for (const item of index) {
             //console.log("=== GetFields BEGIN === ")
-            //console.log(item);
+            console.log(item);
             this._temp_index_loop_count += 1;
             parent_props = parent_props.concat(Object.keys(item).filter(x => !parent_props.includes(x)));
             for (const prop of parent_props) {
@@ -292,7 +293,7 @@ export class CompendiumNavigator extends FormApplication {
                 }
             }
             catch (e) {
-                console.log(prop + "." + ckey + " - Error Message: " + e);
+                console.log("Compnav | " + prop + "." + ckey + " - Error Message: " + e);
             }
             //}
         }

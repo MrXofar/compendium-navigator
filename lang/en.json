@@ -14,29 +14,6 @@
           }
         }
       },
-      "settings": {
-        "version": {
-          "title": "Module install/update detected",
-          "content": "<p>New install or update detected!</p><p>Please read <a href=\"https://github.com/MrXofar/compendium-navigator/blob/master/changes.txt\">changes.txt</a>.</p>"
-        },
-        "Setting1": {
-          "Name": "Setting1",
-          "Hint": "Setting1 description",
-          "choices": {
-            "choice_one": "Choice One",
-            "choice_two": "Choice Two",
-            "choice_three": "Choice Three"
-          }
-        },
-        "Setting2": {
-          "Name": "Setting2",
-          "Hint": "Setting2 description."
-        },
-        "Setting3": {
-          "Name": "Setting3",
-          "Hint": "Setting3 description."
-        }
-      },
       "dialog": {
         "compnav-button": "Compendium Navigator"
       }

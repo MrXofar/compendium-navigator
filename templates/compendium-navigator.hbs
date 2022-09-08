@@ -20,13 +20,13 @@
                 filter_fields_obj = JSON.parse(filter_fields_json);
             }
 
-            console.log("compnav | BuildFilterControls");
+            console.log("Compnav | BuildFilterControls");
             // Save Field selections
             let filter_selections = [];
             {{#each filter_selections as |filter_selections id|}}
                 filter_selections["{{id}}"] = "{{filter_selections}}";
             {{/each}}
-            document.getElementById("filter_name").value = (filter_selections["name"] ? filter_selections["name"] : "");
+            //document.getElementById("filter_name").value = (filter_selections["name"] ? filter_selections["name"] : "");
 
             this.BuildFilterControls(filter_selections, filter_fields_obj);
         }
@@ -41,7 +41,7 @@
                     if (is_child && typeof (value) !== "object") { field_label.classList.add("compnav-filter-child-label"); }
 
                     let field_span = document.createElement("span");
-                    field_span.textContent = (!is_child ? "data." : "." ) + key;
+                    field_span.textContent = (!is_child ? "" : "." ) + key;
                     field_label.appendChild(field_span);
                     let h3 = null;
                     if (!is_child || typeof (value) === "object") { 
@@ -60,7 +60,7 @@
                     //    //parent_filter_container.appendChild(br);
                     //    parent_filter_container.appendChild(field_label);
                     //}
-                    let data_root_key = "data." + root + key
+                    let data_root_key = root + key
                     if (typeof (value) !== "object") {
                         let field_container = document.createElement("div");
                         field_container.classList.add("compnav-form-fields");
@@ -325,10 +325,10 @@
                 </div>
 
                 <div class="compnav-form-group">
-                    <label><h3><span>Name</span></h3></label>
+                    {{!-- <label><h3><span>Name</span></h3></label>
                     <div class="compnav-form-fields">
                         <input id="filter_name" class="compnav-filter-name" type="text" placeholder="string" name="name">
-                    </div>
+                    </div> --}}
                 </div>
             </div>
 

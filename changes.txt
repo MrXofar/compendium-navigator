@@ -10,6 +10,3 @@ v0.0.1 - x/x/2022
 - FormApp_CompNav changed to
 - "form-app-compnav.js" changed to
 - "form-app-compnav.hbs" changed to
-
-- Edit_SubSettings changed to
-- "edit-sub-settings.hbs" change to
