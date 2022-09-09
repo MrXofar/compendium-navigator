@@ -7,7 +7,7 @@
     "compatibility" : {"minimum": "10", "verified":"10"},
     "changelog": "",
     "styles":["styles/compendium-navigator-styles.css"],
-    "relationships.systems": ["dcc","dnd5e"], 
+    "relationships.systems": [], 
     "esmodules": [
       "scripts/main.js"
     ], 
