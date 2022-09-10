@@ -18,12 +18,15 @@
   }
   .compnav-select{    
     width: 100%;
+    cursor: pointer; 
   }
   .compnav-div_lable{
-    width:15%;display: inline-block;
+    width:15%;
+    display: inline-block;
   }
   .compnav-div_user_input{
-    width:84%;display: inline-block;
+    width:84%;
+    display: inline-block;
   }
   .compnav-flex-row{
     display: flex;
@@ -104,10 +107,6 @@
   }
   .compnav-radio-button-input{
     margin-right: 5px !important;
-  }
-  .compnav-selector{
-    width:100%;
-    cursor: pointer; 
   }
   .compnav-class-type, 
   .compnav-doc-class{
@@ -210,4 +209,19 @@
     flex: auto;
     font-size: x-small;
     padding: 3px 3px 0px 0px;
+    min-width: 20%;
+  }
+  .compnav-selected-item-action{
+    font-size: x-large;
+    line-height: 1.3em;
+  }
+  .compnav-action-button{
+    height: 0px  !important;
+    width: auto !important;
+    border: 0px !important;
+    background: transparent !important;
+  }
+  .compnav-action-button:hover{
+    border: 0px !important;
+    box-shadow: none  !important;
   }

@@ -1,12 +1,3 @@
 v0.0.1 - x/x/2022
 ----------------------------------------------
 - Initial Release
-
-- "Compendium Navigator" changed to 
-- "compendium-navigator" changed to
-- "compnav" changed to
-- "compendium-navigator-styles.css" changed to
-
-- FormApp_CompNav changed to
-- "form-app-compnav.js" changed to
-- "form-app-compnav.hbs" changed to

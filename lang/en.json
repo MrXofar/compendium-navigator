@@ -4,7 +4,7 @@
         "title": "Compendium Navigator",
         "filter":{
           "doc-class":{
-            "name": "Class"
+            "name": "Document"
           },
           "class-type":{
             "name": "Type"

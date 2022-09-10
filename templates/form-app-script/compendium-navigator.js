@@ -2,7 +2,7 @@
 //import { RegisteredSettings } from "../../scripts/registered-settings.js";
 
 Hooks.on('renderCompendiumNavigator', () => {
-    console.log("Compnav | renderCompendiumNavigator");
+    //console.log("Compnav | renderCompendiumNavigator");
     Intitialize();
 });
 
@@ -22,6 +22,8 @@ export class CompendiumNavigator extends FormApplication {
     _mapped_fields = [];
     _filter_selections = {};
     _filter_results = [];
+    _selected_items_json = [];
+    _selected_items = [];
 
     constructor() {
         super();
@@ -53,7 +55,9 @@ export class CompendiumNavigator extends FormApplication {
             filter_fields_json: this._filter_fields_json,
             temp_index_loop_count: this._temp_index_loop_count,
             filter_selections: this._filter_selections,
-            filter_results: this._filter_results
+            filter_results: this._filter_results,
+            selected_items_json: this._selected_items_json,
+            selected_items: this._selected_items
         }
     }
 
@@ -80,6 +84,7 @@ export class CompendiumNavigator extends FormApplication {
         for (const class_type of class_types) {
             class_type.addEventListener("click", (event) => {
                 let _type = event.target.innerText;
+                this._filter_selections = {};
                 this._class_types_selected = [];
                 this._class_types_selected.push(_type); // There can be only one! ... for now,... until there can be more.
                 // if (!this._class_types_selected.includes(_type)) {
@@ -194,7 +199,7 @@ export class CompendiumNavigator extends FormApplication {
             this._document_index_keys = {};
             for (const _gpk of this._game_pack_keys_selected) {
                 index = await game.packs.get(_gpk).getIndex({ fields: ["value", "system", "data"] });
-                console.log(index);
+                //console.log(index);
                 this.GetFields(index);
             }
             //console.log(this._document_index_keys);
@@ -218,9 +223,9 @@ export class CompendiumNavigator extends FormApplication {
         //console.log(index);
         for (const item of index) {
             //console.log("=== GetFields BEGIN === ")
-            console.log(item);
+            //console.log(item);
             this._temp_index_loop_count += 1;
-            parent_props = parent_props.concat(Object.keys(item).filter(x => !parent_props.includes(x)));
+            parent_props = parent_props.concat(Object.keys(item).filter(x => !parent_props.includes(x) && x !== "type"));
             for (const prop of parent_props) {
                 if (item[prop] !== undefined) {
 
@@ -302,21 +307,94 @@ export class CompendiumNavigator extends FormApplication {
 
     async _updateObject(event, formData) {
 
-        this._filter_selections = {};
-        this._filter_results = [];
-        this._filter_selections.type = this._class_types_selected[0];
-        let data_keys = Object.keys(formData).filter(data => data !== "hdn_Selected_Items" && formData[data] != null && formData[data] !== false && formData[data] !== "")
-        for (const key of data_keys) {
-            this._filter_selections[key] = formData[key];
-        }
-        //console.log(this._filter_selections);
+        //console.log(event.submitter.id);
+        switch (event.submitter.id) {
 
+            case "submit":
+                this._filter_selections = {};
+                this._filter_results = [];
+                this._filter_selections.type = this._class_types_selected[0];
+                let data_keys = Object.keys(formData).filter(data => data !== "hdn_Selected_Items" && formData[data] != null && formData[data] !== false && formData[data] !== "")
+                for (const key of data_keys) {
+                    this._filter_selections[key] = formData[key];
+                }
+                //console.log(this._filter_selections);
 
-        let index = null;
-        for (const _gpk of this._game_pack_keys_selected) {
-            index = await game.packs.get(_gpk).getIndex({ fields: ["img", "data"] });
-            //console.log(index);
-            this._filter_results = this._filter_results.concat(this.filterData(_gpk, index, this._filter_selections))
+                let index = null;
+                for (const _gpk of this._game_pack_keys_selected) {
+                    index = await game.packs.get(_gpk).getIndex({ fields: ["img", "data"] });
+                    //console.log(index);
+                    this._filter_results = this._filter_results.concat(this.filterData(_gpk, index, this._filter_selections))
+                }
+                break;
+
+            case "reset_filters":
+                this._filter_selections = {};
+                break;
+
+            case "select_item":
+            case "remove_item":
+                // console.log("hdn_Selected_Items");
+                // console.log(formData.hdn_Selected_Items);
+                
+                let Selected_Items = formData.hdn_Selected_Items;
+                let selected_items_obj = [];
+                if (Selected_Items !== "") {
+                    selected_items_obj = JSON.parse(Selected_Items);
+                }
+                
+                this._selected_items = [];
+                for(const item of selected_items_obj){
+                    this._selected_items.push({
+                        _id: item._id,
+                        gpk: item.gpk,
+                        img: item.img,
+                        name:item.name
+                    });
+                }
+                this._selected_items_json = JSON.stringify(this._selected_items, null, 2);
+                // console.log(this._selected_items_json);
+                break;
+
+            case "compnav_create_compendium":
+                
+                break;
+
+            case "compnav_create_rollable_table":
+                console.log("compnav_create_rollable_table");
+                let _Items = formData.hdn_Selected_Items;
+                let _items_obj = [];
+                if (_Items !== "") {
+                    _items_obj = JSON.parse(_Items);
+                }
+
+                let r = 0;
+                if (_items_obj.length > 0) {
+                    _items_obj = _items_obj.map(i => {
+                        r += 1;
+                        return{
+                            _id: i._id,
+                            text: i.name,
+                            img: i.img,
+                            collection: i.gpk,
+                            weight: 1,
+                            range: [r, r],
+                        }
+                    });
+
+                    let tableName = formData.compnav_name;
+
+                    let roll_Table = await RollTable.create({
+                        name: tableName,
+                        results: _items_obj,
+                        replacement: true,
+                        formula: `1d${_items_obj.length}`,
+                        folder: game.folders.getName("WIP").id,
+                    });
+                    await roll_Table.normalize();
+                }
+                break;
+            default:
         }
 
         //console.log(this._filter_results);

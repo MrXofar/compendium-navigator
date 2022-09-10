@@ -4,11 +4,11 @@ import { CompendiumNavigator } from '../templates/form-app-script/compendium-nav
 
 Hooks.once("init", () => {
 	//registerSettings();
-	Handlebars.registerHelper('checked', function(value, test) {
+	Handlebars.registerHelper('compnav_checked', function(value, test) {
 		if (value == undefined) return '';
 		return value==test ? 'checked' : '';
 	});
-	Handlebars.registerHelper('toJSON', function(obj) {
+	Handlebars.registerHelper('compnav_toJSON', function(obj) {
 		return JSON.stringify(obj, null, 3);
 	});
 	console.log(CompNav.ID + " | Initialized")

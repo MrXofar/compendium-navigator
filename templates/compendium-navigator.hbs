@@ -1,6 +1,6 @@
 <form>
     <script>
-        Selected_Items = [];
+        //Selected_Items = [];
         function Intitialize() {
 
             //let filter_selections = compnav_form_container.dataset.filter_selections;
@@ -20,7 +20,7 @@
                 filter_fields_obj = JSON.parse(filter_fields_json);
             }
 
-            console.log("Compnav | BuildFilterControls");
+            //console.log("Compnav | BuildFilterControls");
             // Save Field selections
             let filter_selections = [];
             {{#each filter_selections as |filter_selections id|}}
@@ -143,119 +143,84 @@
             }
         }
         
-        function dragstart_handler(ev) {
-            ev.dataTransfer.setData("text/plain", ev.target.title);        
-            ev.dataTransfer.setData("text/plain", ev.target.id);
-            ev.dataTransfer.dropEffect = "copy";
+        //async function ShowItem(pack, item_id) {
+        //    let doc = await pack.getDocument(item_id);
+        //    doc.sheet.render(true);
+        //}
+
+        function ShowActionButtons(event){
+            const item = document.getElementById(event.target.id);
+            item.querySelector(".compnav-action-buttons").classList.remove("compnav-display-none");
+            //p_action_buttons.classList.remove("compnav-display-none");
         }
 
-        function dragover_handler(ev) {
-            console.log("Dragging over drop zone");
-            ev.preventDefault();
-            ev.dataTransfer.dropEffect = "copy";
+        function HideActionButtons(event){
+            const item = document.getElementById(event.target.id);
+            item.querySelector(".compnav-action-buttons").classList.add("compnav-display-none");
+            //p_action_buttons.classList.add("compnav-display-none");
         }
 
-        async function drop_handler(ev) {
-            ev.preventDefault();
-            const data = ev.dataTransfer.getData("text/plain");
-            const drop_item_id = document.getElementById(data).id
-            const drop_item_gpk = document.getElementById(data).title
-            const drop_zone = document.getElementById(ev.target.id);
-            
-            
-            console.log(drop_item_gpk);
-            console.log(drop_item_id);
-            console.log(drop_zone.id);
+        async function SelectItem(event){
 
-            let pack = game.packs.get(drop_item_gpk);
-            let item = await pack.getDocument(drop_item_id);
-            console.log(item);
-
-            Selected_Items.push({
-                _id: drop_item_id,
-                gpk: drop_item_gpk,
-                img: item.img,
-                name: item.name
-            });
-            let hdn_Selected_Items = document.getElementById("hdn_Selected_Items");
-            hdn_Selected_Items.value = Selected_Items;
-            console.log(Selected_Items);
-
-            // TODO: Farm out to function
-            // TODO: Check to see if item already selected
-            // TODO: Build html
-            
-            //let item_label = document.createElement("label");
-            //let br = document.createElement("br");
-            //item_label.textContent = item.name;
-            //drop_zone.appendChild(item_label);
-            //drop_zone.appendChild(br);
-
-            let div_item_selected_container = document.createElement("div");
-            div_item_selected_container.classList.add("compnav-flex-row");
-            div_item_selected_container.classList.add("compnav-filtered-result");
-            div_item_selected_container.id = "selected_item_" + drop_item_id;
-            div_item_selected_container.title = drop_item_gpk;
-            //div_item_selected_container.setAttribute("data-game_pack_key", drop_item_gpk);
-            div_item_selected_container.setAttribute("data-document_id", drop_item_id);
-
-            let div_item_selected_img = document.createElement("div");
-            div_item_selected_img.classList.add("compnav-filtered-result-img");
-            let item_selected_img = document.createElement("img");
-            item_selected_img.src = item.img;
-            item_selected_img.height = 48;
-            item_selected_img.width = 48;
-            div_item_selected_img.appendChild(item_selected_img);
-
-            let div_item_selected_name = document.createElement("div");
-            div_item_selected_name.classList.add("compnav-filtered-result-name");
-            let h4 = document.createElement("h4");
-            let a = document.createElement("a");
-            a.innerText = item.name;
-            h4.appendChild(a);
-            div_item_selected_name.appendChild(h4);
-
-            div_item_selected_name.addEventListener("click", (event) => {
-                let item_id = drop_item_id;
-                let pack = game.packs.find(p => p.collection === drop_item_gpk);
-                this.ShowItem(pack, item_id);
-            });
-
-            div_item_selected_container.appendChild(div_item_selected_img);
-            div_item_selected_container.appendChild(div_item_selected_name);
-
-            if(item.source !== undefined){
-                let div_item_selected_source = document.createElement("div");
-                div_item_selected_source.classList.add("compnav-filtered-result-source");
-                let span = document.createElement("span");
-                span.innerText = item.source
-                div_item_selected_source.appendChild(span);
-                div_item_selected_container.appendChild(div_item_selected_source);
+            let Selected_Items_json = compnav_form_container.dataset.selected_items_json;
+            let selected_items_obj = [];
+            if (Selected_Items_json !== "") {
+                selected_items_obj = JSON.parse(Selected_Items_json);
             }
 
-            drop_zone.appendChild(div_item_selected_container);
+            const item_button = await document.getElementById(event.target.id).parentElement.parentElement;
+            let pack = await game.packs.get(item_button.dataset.game_pack_key);
+            let item = await pack.getDocument(item_button.dataset.document_id);
+            //console.log(item);
 
+            if(selected_items_obj.filter(x => x._id === item._id).length === 0)
+            {
+                selected_items_obj.push({
+                    _id: item._id,
+                    gpk: item.compendium.collection,
+                    img: item.img,
+                    name: item.name
+                });    
 
-            //<div id="{{filter_results._id}}" class="compnav-flex-row compnav-filtered-result" title="{{filter_results.gpk}}" 
-            //data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}"
-            //draggable="true" ondragstart="dragstart_handler(event)">
-            //    <div class="compnav-filtered-result-img">
-            //        <img src="{{filter_results.img}}" width="48" height="48" />
-            //    </div>
-            //    <div class="compnav-filtered-result-name">
-            //        <h4><a>{{filter_results.name}}</a></h4>
-            //    </div>
-            //    <div class="compnav-filtered-result-source">
-            //        <span>{{filter_results.source}}</span>
-            //    </div>
-            //</div>
-
+                let hdn_Selected_Items = document.getElementById("hdn_Selected_Items");
+                hdn_Selected_Items.value = JSON.stringify(selected_items_obj, null, 2);
+                
+                //console.log("SelectItem");
+                //console.log(selected_items_obj);
+                //console.log(hdn_Selected_Items.value);
+                select_item.click();       
+            }
         }
         
-        async function ShowItem(pack, item_id) {
-            let doc = await pack.getDocument(item_id);
-            doc.sheet.render(true);
+        async function RemoveItem(event){
+            //console.log("RemoveItem");
+            //console.log(item_button.dataset.document_id);
+            let Selected_Items_json = compnav_form_container.dataset.selected_items_json;
+            let selected_items_obj = [];
+            if (Selected_Items_json !== "") {
+                selected_items_obj = JSON.parse(Selected_Items_json);
+            }
+
+            const item_button = await document.getElementById(event.target.id).parentElement.parentElement;
+            selected_items_obj = selected_items_obj.filter(x => x._id !== item_button.dataset.document_id);
+            let hdn_Selected_Items = document.getElementById("hdn_Selected_Items");
+            hdn_Selected_Items.value = JSON.stringify(selected_items_obj, null, 2);
+            remove_item.click();   
         }
+
+        async function CreateRollTable(event){
+            let Selected_Items_json = compnav_form_container.dataset.selected_items_json;
+            let selected_items_obj = [];
+            if (Selected_Items_json !== "") {
+                selected_items_obj = JSON.parse(Selected_Items_json);
+            }
+
+            let hdn_Selected_Items = document.getElementById("hdn_Selected_Items");
+            hdn_Selected_Items.value = JSON.stringify(selected_items_obj, null, 2);
+            compnav_create_rollable_table.click(); 
+
+        }
+
 
     </script>
 
@@ -263,7 +228,8 @@
 
     <div id="compnav_form_container" class="compnav-form-container" data-class_types_selected="{{class_types_selected}}"
         data-game_pack_keys_selected="{{game_pack_keys_selected}}" data-filter_fields_json="{{filter_fields_json}}" 
-        data-game_pack_names="{{game_pack_names}}" data-doc_class_selected="{{doc_class_selected}}" data-filter_selections="{{filter_selections}}" >
+        data-game_pack_names="{{game_pack_names}}" data-doc_class_selected="{{doc_class_selected}}" 
+        data-filter_selections="{{filter_selections}}" data-selected_items_json="{{selected_items_json}}">
 
         <div class="compnav-form-column">
             <h3>Filter</h3>
@@ -311,24 +277,23 @@
 
             <div id="div_compnav_fields" class="compnav-filter-container">
                 <div>
-                    <button type="submit" id="submit">
-                        <i class="fa fa-filter"></i>Filter
-                    </button>
-                <div class="compnav-filtered-result-source">
-                    {{#each filter_selections as |filter_selections id|}}
-                    <span>{{ id}}: {{filter_selections}}&nbsp;+</span>
-                    {{/each}}
-                </div>
                     <p>
-                        <h3>Fields:</h3>
+                        <button type="submit" id="submit">
+                            <i class="fa fa-filter"></i>Filter
+                        </button>
                     </p>
+                    <p>
+                        <button type="submit" id="reset_filters">
+                            <i class="fa fa-arrow-rotate-left"></i>Reset Fields
+                        </button>
+                    </p>
+                    <div class="compnav-filtered-result-source">
+                        {{#each filter_selections as |filter_selections id|}}
+                        <span>{{ id}}: {{filter_selections}},&nbsp;</span>
+                        {{/each}}
+                    </div>
                 </div>
-
                 <div class="compnav-form-group">
-                    {{!-- <label><h3><span>Name</span></h3></label>
-                    <div class="compnav-form-fields">
-                        <input id="filter_name" class="compnav-filter-name" type="text" placeholder="string" name="name">
-                    </div> --}}
                 </div>
             </div>
 
@@ -345,8 +310,8 @@
             <h3>Results</h3>
             {{#each filter_results as |filter_results id|}}
             <div id="{{filter_results._id}}" class="compnav-flex-row compnav-filtered-result" title="{{filter_results.gpk}}" 
-            data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}"
-            draggable="true" ondragstart="dragstart_handler(event)">
+            data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}" 
+            onmouseenter="ShowActionButtons(event);" onmouseleave="HideActionButtons(event);">
                 <div class="compnav-filtered-result-img">
                     <img src="{{filter_results.img}}" width="48" height="48" />
                 </div>
@@ -354,31 +319,66 @@
                     <h4><a>{{filter_results.name}}</a></h4>
                 </div>
                 <div class="compnav-filtered-result-source">
-                    <span>{{filter_results.source}}</span>
+                    {{!-- {{filter_results.system.source}} --}}
+                    <p class="compnav-action-buttons compnav-display-none">
+                        <button class="compnav-action-button" type="submit" onclick="SelectItem(event);" 
+                            data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}">
+                            <a><i id="select_item_{{filter_results._id}}" title="Select item" class="fa fa-angle-double-right compnav-selected-item-action"></i></a>
+                        </button>   
+                    </p>
                 </div>
             </div>
             {{/each}}
         </div>
 
-        <div id="Selected_Item_Drop_Zone" class="compnav-form-column compnav-form-col-border" ondrop="drop_handler(event)" ondragover="dragover_handler(event)">
-            <h3>Selected</h3>     
-            <input id="hdn_Selected_Items" type="hidden" name="hdn_Selected_Items" value=""></hidden>              
-            {{#each Selected_Items as |Selected_Items id|}}
-            <div id="{{Selected_Items._id}}" class="compnav-flex-row compnav-filtered-result" title="{{Selected_Items.gpk}}" 
-            data-game_pack_key="{{Selected_Items.gpk}}" data-document_id="{{Selected_Items._id}}"
-            draggable="true" ondragstart="dragstart_handler(event)">
+        <div id="Selected_Item_Drop_Zone" class="compnav-form-column compnav-form-col-border">
+            <h3>Selected</h3>   
+            <div class="compnav-form-group">
+                <label><span>Name</span></label>
+                <div class="compnav-form-fields">
+                    <input type="text" name="compnav_name" data-dtype="String">
+                </div>
+            </div>
+            <p>
+                <button type="submit" id="compnav_create_compendium">
+                    <i class="fa fa-book-atlas"></i>Create Compendium
+                </button>
+            </p>
+            <p>
+                <button onclick="CreateRollTable(event);">
+                    <i class="fa fa-table-list"></i>Create Rollable Table
+                </button>
+            </p>
+            <input id="hdn_Selected_Items" type="hidden" name="hdn_Selected_Items" value=""></hidden>
+            {{#each selected_items as |selected_items id|}}
+            <div id="selected_item_{{selected_items._id}}" class="compnav-flex-row compnav-filtered-result" title="{{selected_items.gpk}}" 
+            data-game_pack_key="{{selected_items.gpk}}" data-document_id="{{selected_items._id}}" 
+            onmouseenter="ShowActionButtons(event);" onmouseleave="HideActionButtons(event);">
                 <div class="compnav-filtered-result-img">
-                    <img src="{{Selected_Items.img}}" width="48" height="48" />
+                    <img src="{{selected_items.img}}" width="48" height="48" />
                 </div>
                 <div class="compnav-filtered-result-name">
-                    <h4><a>{{Selected_Items.name}}</a></h4>
+                    <h4><a>{{selected_items.name}}</a></h4>
                 </div>
                 <div class="compnav-filtered-result-source">
-                    <span>{{Selected_Items.source}}</span>
+                    <p class="compnav-action-buttons compnav-display-none">
+                        <button class="compnav-action-button" type="submit" onclick="RemoveItem(event);" 
+                            data-game_pack_key="{{selected_items.gpk}}" data-document_id="{{selected_items._id}}">
+                            <a><i id="remove_item_{{selected_items._id}}" title="Remove item" class="fa fa-trash-can compnav-selected-item-action"></i></a>
+                        </button>   
+                    </p>
                 </div>
             </div>
             {{/each}}     
         </div>
     </div>
-
+    <button type="submit" id="select_item" class="compnav-display-none">
+    </button>
+    <button type="submit" id="remove_item" class="compnav-display-none">
+    </button>
+    <button type="submit" id="compnav_create_compendium" class="compnav-display-none">
+    </button>
+    <button type="submit" id="compnav_create_rollable_table" class="compnav-display-none">
+    </button>
+    
 </form>
