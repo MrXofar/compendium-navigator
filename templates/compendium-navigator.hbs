@@ -20,6 +20,10 @@
                 filter_fields_obj = JSON.parse(filter_fields_json);
             }
 
+            if({{{show_delete_cf_tempentity}}}){
+            document.getElementById("p_delete_cf_entity").classList.remove("compnav-display-none");
+            }
+
             //console.log("Compnav | BuildFilterControls");
             // Save Field selections
             let filter_selections = [];
@@ -150,13 +154,11 @@
         function ShowActionButtons(event){
             const item = document.getElementById(event.target.id);
             item.querySelector(".compnav-action-buttons").classList.remove("compnav-display-none");
-            //p_action_buttons.classList.remove("compnav-display-none");
         }
 
         function HideActionButtons(event){
             const item = document.getElementById(event.target.id);
             item.querySelector(".compnav-action-buttons").classList.add("compnav-display-none");
-            //p_action_buttons.classList.add("compnav-display-none");
         }
 
         async function SelectItem(event){
@@ -238,6 +240,19 @@
             hdn_Selected_Items.value = JSON.stringify(selected_items_obj, null, 2);
             compnav_select_all.click();       
         }
+        
+        async function DeleteItem(event){
+            console.log("DeleteItem");
+            const item_button = await document.getElementById(event.target.id).parentElement.parentElement;
+            {{#each filter_results as |filter_results id|}}
+                if("{{filter_results.name}}" === "#[CF_tempEntity]") {
+                    let pack = await game.packs.get("{{filter_results.gpk}}");
+                    let item = await pack.getDocument("{{filter_results._id}}");
+                    pack.delete(item._id)
+                }
+            {{/each}}
+            submit.click();   
+        }
 
     </script>
 
@@ -318,6 +333,11 @@
                         <i class="fa fa-angle-double-right"></i>Select All
                     </button>
                 </p>
+                <p id="p_delete_cf_entity" class="compnav-display-none">
+                    <button onclick="DeleteItem(event);" id="delete_cf_entity">
+                        <i class="fa fa-ban compnav-ban"></i>Delete #[CF_tempEntity]
+                    </button>
+                </p>
                 <p>
                     <button type="submit" id="clear_results">
                         <i class="fa fa-arrow-rotate-left"></i>Clear Results
@@ -339,6 +359,11 @@
                     <div class="compnav-filtered-result-source">
                         {{!-- {{filter_results.system.source}} --}}
                         <p class="compnav-action-buttons compnav-display-none">
+                            {{!-- <button class="compnav-action-button" type="submit" onclick="DeleteItem(event);"
+                                data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}">
+                                <a><i id="delete_item_{{filter_results._id}}" title="Delete item"
+                                        class="fa fa-ban compnav-selected-item-action compnav-ban" ></i></a>
+                            </button> --}}
                             <button class="compnav-action-button" type="submit" onclick="SelectItem(event);"
                                 data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}">
                                 <a><i id="select_item_{{filter_results._id}}" title="Select item"
@@ -414,6 +439,8 @@
         </div>
     </div>
     <button type="submit" id="select_item" class="compnav-display-none">
+    </button>
+    <button type="submit" id="delete_item" class="compnav-display-none">
     </button>
     <button type="submit" id="remove_item" class="compnav-display-none">
     </button>

@@ -251,3 +251,7 @@
     overflow-y: scroll;
     height: 710px;
   }
+  .compnav-ban{
+    color: red;
+    font-size: smaller;
+  }

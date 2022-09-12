@@ -1,19 +1,33 @@
 
-v1.0.0 - x/x/2022
+v0.0.2 - 09/12/2022
 ----------------------------------------------
 
 TODO:
-- DONE - Sticky header
-- DONE - Individual columns
 - Better field control builder (sort properties better)
-- Existing Roll Table edit
-- Field control functions. "Hide/Show", "Whole Word", "Match Case", "Number Logic"
-- Select All
-- Deselct All
-- Delete from unlocked compendium
-- Remember scroll bar position
-- Optimize selection to reduce ui delay
+    Have child properties display more accurately under parent instead of alphabetical
 
+- Edit Existing Roll Table
+
+- Field control functions. "Hide/Show", "Whole Word", "Match Case", "Number Logic"
+    Allow user to customize which fields to display or hide.
+    Allow user to apply number logic and wild card operators.
+
+- Delete from unlocked compendium
+    Allow user to lock/unlock packs (compendiums) 
+    Allow user to delete items from unlocked compendium.
+    Add button to delete #[CF_tempEntity] items.
+
+- Remember scroll bar position
+    On render, remember scroll positions of each column (Update panel sure would be nice)
+
+- Optimize selection to reduce ui delay
+    UI experiences delay when there are a lot of items and complex field structure.
+    Better "post backs" ???
+
+- DONE - "Sticky" headers/top conrols
+- DONE - Individual columns
+- DONE - Select All
+- DONE - Deselct All
 
 v0.0.1 - x/x/2022
 ----------------------------------------------

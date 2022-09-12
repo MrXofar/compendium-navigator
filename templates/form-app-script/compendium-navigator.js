@@ -57,7 +57,8 @@ export class CompendiumNavigator extends FormApplication {
             filter_selections: this._filter_selections,
             filter_results: this._filter_results,
             selected_items_json: this._selected_items_json,
-            selected_items: this._selected_items
+            selected_items: this._selected_items,
+            show_delete_cf_tempentity: this._filter_results.filter(x => x.name === "#[CF_tempEntity]").length > 0
         }
     }
 
@@ -349,6 +350,7 @@ export class CompendiumNavigator extends FormApplication {
                 break;
             case "select_item":
             case "remove_item":
+            case "delete_item":
             case "compnav_select_all":
                 // console.log("hdn_Selected_Items");
                 // console.log(formData.hdn_Selected_Items);
