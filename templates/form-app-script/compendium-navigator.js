@@ -75,6 +75,9 @@ export class CompendiumNavigator extends FormApplication {
                 this._class_types_selected = [];
                 this._game_pack_keys_selected = [];
                 this._filter_fields_json = [];
+                this._filter_results = [];
+                this._selected_items_json = [];
+                this._selected_items = [];
                 this.GetGamePackNames();
             });
         }
@@ -202,8 +205,11 @@ export class CompendiumNavigator extends FormApplication {
                 //console.log(index);
                 this.GetFields(index);
             }
-            //console.log(this._document_index_keys);
+            console.log(this._document_index_keys);
+            // TODO: Attempt to sort so that all children properties are under their Parent property
+
             this._filter_fields_json = JSON.stringify(this._document_index_keys, null, 2);
+            console.log(this._filter_fields_json)
 
             // Cache mapped fields
             this._mapped_fields.push({
@@ -214,6 +220,8 @@ export class CompendiumNavigator extends FormApplication {
         else {
             this._filter_fields_json = this._mapped_fields.find(x => x.class_type === class_type).filter_fields_json
         }
+        
+
         //console.log(this._filter_fields_json);
         this.render();
     }
@@ -332,8 +340,16 @@ export class CompendiumNavigator extends FormApplication {
                 this._filter_selections = {};
                 break;
 
+            case "clear_results":
+                this._filter_results = [];
+                break;
+            case "clear_selections":
+                this._selected_items_json = [];
+                this._selected_items = [];
+                break;
             case "select_item":
             case "remove_item":
+            case "compnav_select_all":
                 // console.log("hdn_Selected_Items");
                 // console.log(formData.hdn_Selected_Items);
                 
@@ -369,25 +385,32 @@ export class CompendiumNavigator extends FormApplication {
                     _items_obj = JSON.parse(_Items);
                 }
 
+                _items_obj.forEach((el)=>{
+                    if(el.rarity !== undefined){
+                        el.rarity = (el.rarity = "" ? "common" : String(el.rarity).toLocaleLowerCase());
+                    }
+                }) 
+
                 const flat_rarity = _items_obj.every(val => val.rarity === _items_obj[0].rarity);// Are all rarities the same?
-                console.log("flat_rarity = " + flat_rarity)
                 let rarity_weight = {"common":64, 
                                      "uncommon":20 ,     
                                      "rare":10,
-                                     "veryRare":5,
+                                     "veryrare":5,
                                      "legendary":1};
                 
-                let r = 0;
+                let rng = 0;
+                let wt = 1;
                 if (_items_obj.length > 0) {
                     _items_obj = _items_obj.map(i => {
-                        r += 1;
+                        rng += 1;
+                        wt = (!flat_rarity && i.rarity !== undefined && i.rarity !== "" ? rarity_weight[i.rarity] : 1)
                         return{
                             _id: i._id,
                             text: i.name,
                             img: i.img,
                             collection: i.gpk,
-                            weight: (!flat_rarity && i.rarity !== undefined && i.rarity !== "" ? rarity_weight[i.rarity] : 1),
-                            range: [r, r],
+                            weight: (wt >= 1 ? wt : 1),
+                            range: [rng, rng],
                             type: CONST.TABLE_RESULT_TYPES.COMPENDIUM,
 
                         }
@@ -405,6 +428,7 @@ export class CompendiumNavigator extends FormApplication {
                     await roll_Table.normalize();
                 }
                 break;
+
             default:
         }
 

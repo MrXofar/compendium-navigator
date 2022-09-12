@@ -3,7 +3,7 @@
     "title": "Compendium Navigator",
     "description": "Compendium Navigator Description",
     "authors": [{"name": "Richard Fox"}],
-    "version": "0.0.1",
+    "version": "0.0.2",
     "compatibility" : {"minimum": "10", "verified":"10"},
     "changelog": "",
     "styles":["styles/compendium-navigator-styles.css"],
@@ -19,7 +19,7 @@
       }
     ],
     "manifest": "https://raw.githubusercontent.com/MrXofar/compendium-navigator/master/module.json",
-    "download": "https://github.com/MrXofar/compendium-navigator/releases/download/v0.0.1/module.json",
+    "download": "https://github.com/MrXofar/compendium-navigator/releases/download/v0.0.2/module.json",
     "url": "https://github.com/MrXofar/compendium-navigator",
     "readme": "https://github.com/MrXofar/compendium-navigator/blob/master/README.md",
     "bugs": "https://github.com/MrXofar/compendium-navigator/issues"

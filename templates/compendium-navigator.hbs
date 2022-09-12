@@ -30,7 +30,6 @@
 
             this.BuildFilterControls(filter_selections, filter_fields_obj);
         }
-
         // The parent_filter_container wasn't working out, but I still want to be able to group items in the same container
         // so just leaving it commented out for now until I can get back to it.
         function BuildFilterControls(filter_selections, filter_fields_obj, is_child, root = "") {
@@ -222,6 +221,23 @@
 
         }
 
+        async function SelectAll(event){
+            let selected_items_obj = [];
+
+            {{#each filter_results as |filter_results id|}}
+                selected_items_obj.push({
+                        _id:    "{{filter_results._id}}",
+                        gpk:    "{{filter_results.gpk}}",
+                        img:    "{{filter_results.img}}",
+                        name:   "{{filter_results.name}}",
+                        rarity: "{{filter_results.system.rarity}}"
+                    });  
+            {{/each}}
+            
+            let hdn_Selected_Items = document.getElementById("hdn_Selected_Items");
+            hdn_Selected_Items.value = JSON.stringify(selected_items_obj, null, 2);
+            compnav_select_all.click();       
+        }
 
     </script>
 
@@ -233,8 +249,7 @@
         data-filter_selections="{{filter_selections}}" data-selected_items_json="{{selected_items_json}}">
 
         <div class="compnav-form-column">
-            <h3>Filter</h3>
-
+            <h3>Filter</h3>        
             <div>
                 {{localize "CompNav.form-app.filter.doc-class.name"}}:
             </div>
@@ -244,8 +259,7 @@
                     <span id="compnav_doc_class_{{doc_classes}}" class="compnav-doc-class">{{doc_classes}}</span>
                     {{/each}}
                 </p>
-            </div>
-
+            </div>        
             <div>
                 {{localize "CompNav.form-app.filter.class-type.name"}}:
             </div>
@@ -258,15 +272,15 @@
                     <span id="compnav_class_type_{{class_types}}" class="compnav-class-type">{{class_types}}</span>
                     {{/each}}
                 </p>
-            </div>
-
+            </div>        
             <div>
                 {{localize "CompNav.form-app.filter.game-pack.name"}}:
             </div>
             <div id="div_compnav_game_packs" class="compnav-form-filter">
                 <p class="compnav-filter-bubble-container">
                     {{#each game_pack_names as |game_pack_names id|}}
-                    <span id="compnav_game_pack_name_{{id}}" title={{id}} class="compnav-game-pack-name compnav-display-none">{{game_pack_names}}</span>
+                    <span id="compnav_game_pack_name_{{id}}" title={{id}}
+                        class="compnav-game-pack-name compnav-display-none">{{game_pack_names}}</span>
                     {{/each}}
                 </p>
                 {{!-- <p class="notes">
@@ -275,61 +289,66 @@
                     {{/each}}
                 </p> --}}
             </div>
-
-            <div id="div_compnav_fields" class="compnav-filter-container">
-                <div>
-                    <p>
-                        <button type="submit" id="submit">
-                            <i class="fa fa-filter"></i>Filter
-                        </button>
-                    </p>
-                    <p>
-                        <button type="submit" id="reset_filters">
-                            <i class="fa fa-arrow-rotate-left"></i>Reset Fields
-                        </button>
-                    </p>
-                    <div class="compnav-filtered-result-source">
-                        {{#each filter_selections as |filter_selections id|}}
-                        <span>{{ id}}: {{filter_selections}},&nbsp;</span>
-                        {{/each}}
-                    </div>
-                </div>
-                <div class="compnav-form-group">
+            <div>
+                <p>
+                    <button type="submit" id="submit">
+                        <i class="fa fa-filter"></i>Filter
+                    </button>
+                </p>
+                <p>
+                    <button type="submit" id="reset_filters">
+                        <i class="fa fa-arrow-rotate-left"></i>Reset Fields
+                    </button>
+                </p>
+                <div class="compnav-filtered-result-source">
+                    {{#each filter_selections as |filter_selections id|}}
+                    <span>{{ id}}: {{filter_selections}},&nbsp;</span>
+                    {{/each}}
                 </div>
             </div>
-
-            {{!-- <textarea style="width: 100%;
-                overflow-wrap: break-word;
-                font-size: smaller;
-                margin: 0px;
-                height: 840px;
-                border: none;">{{filter_fields_json}}</textarea> --}}
-
+            <div id="div_compnav_fields" class="compnav-flex-scrollable">        
+            </div>
         </div>
         
         <div class="compnav-form-column compnav-form-col-border">
             <h3>Results</h3>
-            {{#each filter_results as |filter_results id|}}
-            <div id="{{filter_results._id}}" class="compnav-flex-row compnav-filtered-result" title="{{filter_results.gpk}}" 
-            data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}" 
-            onmouseenter="ShowActionButtons(event);" onmouseleave="HideActionButtons(event);">
-                <div class="compnav-filtered-result-img">
-                    <img src="{{filter_results.img}}" width="48" height="48" />
-                </div>
-                <div class="compnav-filtered-result-name">
-                    <h4><a>{{filter_results.name}}</a></h4>
-                </div>
-                <div class="compnav-filtered-result-source">
-                    {{!-- {{filter_results.system.source}} --}}
-                    <p class="compnav-action-buttons compnav-display-none">
-                        <button class="compnav-action-button" type="submit" onclick="SelectItem(event);" 
-                            data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}">
-                            <a><i id="select_item_{{filter_results._id}}" title="Select item" class="fa fa-angle-double-right compnav-selected-item-action"></i></a>
-                        </button>   
-                    </p>
-                </div>
+            <div>
+                <p>
+                    <button onclick="SelectAll(event);">
+                        <i class="fa fa-angle-double-right"></i>Select All
+                    </button>
+                </p>
+                <p>
+                    <button type="submit" id="clear_results">
+                        <i class="fa fa-arrow-rotate-left"></i>Clear Results
+                    </button>
+                </p>
             </div>
-            {{/each}}
+
+            <div class="compnav-flex-scrollable">
+                {{#each filter_results as |filter_results id|}}
+                <div id="{{filter_results._id}}" class="compnav-flex-row compnav-filtered-result" title="{{filter_results.gpk}}"
+                    data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}"
+                    onmouseenter="ShowActionButtons(event);" onmouseleave="HideActionButtons(event);">
+                    <div class="compnav-filtered-result-img">
+                        <img src="{{filter_results.img}}" width="48" height="48" />
+                    </div>
+                    <div class="compnav-filtered-result-name">
+                        <h4><a>{{filter_results.name}}</a></h4>
+                    </div>
+                    <div class="compnav-filtered-result-source">
+                        {{!-- {{filter_results.system.source}} --}}
+                        <p class="compnav-action-buttons compnav-display-none">
+                            <button class="compnav-action-button" type="submit" onclick="SelectItem(event);"
+                                data-game_pack_key="{{filter_results.gpk}}" data-document_id="{{filter_results._id}}">
+                                <a><i id="select_item_{{filter_results._id}}" title="Select item"
+                                        class="fa fa-angle-double-right compnav-selected-item-action"></i></a>
+                            </button>
+                        </p>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
         </div>
 
         <div id="Selected_Item_Drop_Zone" class="compnav-form-column compnav-form-col-border">
@@ -337,7 +356,7 @@
             <div class="compnav-form-group">
                 <label><span>Name</span></label>
                 <div class="compnav-form-fields">
-                    <input type="text" name="compnav_name" data-dtype="String">
+                    <input type="text" name="compnav_name" placeholder="New Rollable Table" data-dtype="String">
                 </div>
             </div> 
             {{!-- <div class="compnav-form-group">
@@ -355,32 +374,43 @@
                     <i class="fa fa-book-atlas"></i>Create Compendium
                 </button>
             </p> --}}
-            <p>
-                <button onclick="CreateRollTable(event);">
-                    <i class="fa fa-table-list"></i>Create Rollable Table
-                </button>
-            </p>
-            <input id="hdn_Selected_Items" type="hidden" name="hdn_Selected_Items" value=""></hidden>
-            {{#each selected_items as |selected_items id|}}
-            <div id="selected_item_{{selected_items._id}}" class="compnav-flex-row compnav-filtered-result" title="{{selected_items.gpk}}" 
-            data-game_pack_key="{{selected_items.gpk}}" data-document_id="{{selected_items._id}}" 
-            onmouseenter="ShowActionButtons(event);" onmouseleave="HideActionButtons(event);">
-                <div class="compnav-filtered-result-img">
-                    <img src="{{selected_items.img}}" width="48" height="48" />
+            <div>
+                <p>
+                    <button onclick="CreateRollTable(event);">
+                        <i class="fa fa-table-list"></i>Create Rollable Table
+                    </button>
+                </p>
+                <p>
+                    <button type="submit" id="clear_selections">
+                        <i class="fa fa-arrow-rotate-left"></i>Clear Selections
+                    </button>
+                </p>
                 </div>
-                <div class="compnav-filtered-result-name">
-                    <h4><a>{{selected_items.name}}</a></h4>
+            <div class="compnav-flex-scrollable">            
+                <input id="hdn_Selected_Items" type="hidden" name="hdn_Selected_Items" value=""></hidden>
+                {{#each selected_items as |selected_items id|}}
+                <div id="selected_item_{{selected_items._id}}" class="compnav-flex-row compnav-filtered-result"
+                    title="{{selected_items.gpk}}" data-game_pack_key="{{selected_items.gpk}}"
+                    data-document_id="{{selected_items._id}}" onmouseenter="ShowActionButtons(event);"
+                    onmouseleave="HideActionButtons(event);">
+                    <div class="compnav-filtered-result-img">
+                        <img src="{{selected_items.img}}" width="48" height="48" />
+                    </div>
+                    <div class="compnav-filtered-result-name">
+                        <h4><a>{{selected_items.name}}</a></h4>
+                    </div>
+                    <div class="compnav-filtered-result-source">
+                        <p class="compnav-action-buttons compnav-display-none">
+                            <button class="compnav-action-button" type="submit" onclick="RemoveItem(event);"
+                                data-game_pack_key="{{selected_items.gpk}}" data-document_id="{{selected_items._id}}">
+                                <a><i id="remove_item_{{selected_items._id}}" title="Remove item"
+                                        class="fa fa-trash-can compnav-selected-item-action"></i></a>
+                            </button>
+                        </p>
+                    </div>
                 </div>
-                <div class="compnav-filtered-result-source">
-                    <p class="compnav-action-buttons compnav-display-none">
-                        <button class="compnav-action-button" type="submit" onclick="RemoveItem(event);" 
-                            data-game_pack_key="{{selected_items.gpk}}" data-document_id="{{selected_items._id}}">
-                            <a><i id="remove_item_{{selected_items._id}}" title="Remove item" class="fa fa-trash-can compnav-selected-item-action"></i></a>
-                        </button>   
-                    </p>
-                </div>
+                {{/each}}
             </div>
-            {{/each}}     
         </div>
     </div>
     <button type="submit" id="select_item" class="compnav-display-none">
@@ -390,6 +420,8 @@
     <button type="submit" id="compnav_create_compendium" class="compnav-display-none">
     </button>
     <button type="submit" id="compnav_create_rollable_table" class="compnav-display-none">
+    </button>
+    <button type="submit" id="compnav_select_all" class="compnav-display-none">
     </button>
     
 </form>

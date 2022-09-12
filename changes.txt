@@ -1,3 +1,20 @@
+
+v1.0.0 - x/x/2022
+----------------------------------------------
+
+TODO:
+- DONE - Sticky header
+- DONE - Individual columns
+- Better field control builder (sort properties better)
+- Existing Roll Table edit
+- Field control functions. "Hide/Show", "Whole Word", "Match Case", "Number Logic"
+- Select All
+- Deselct All
+- Delete from unlocked compendium
+- Remember scroll bar position
+- Optimize selection to reduce ui delay
+
+
 v0.0.1 - x/x/2022
 ----------------------------------------------
 - Initial Release
