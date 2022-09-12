@@ -55,7 +55,7 @@ export class CompendiumNavigator extends FormApplication {
             filter_fields_json: this._filter_fields_json,
             temp_index_loop_count: this._temp_index_loop_count,
             filter_selections: this._filter_selections,
-            filter_results: this._filter_results,
+            filter_results: this._filter_results.filter(x => x.name != '#[CF_tempEntity]'),
             selected_items_json: this._selected_items_json,
             selected_items: this._selected_items,
             //show_delete_cf_tempentity: this._filter_results.filter(x => x.name === "#[CF_tempEntity]").length > 0
