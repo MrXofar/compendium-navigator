@@ -10,12 +10,12 @@ TODO:
 
 - Field control functions. "Hide/Show", "Whole Word", "Match Case", "Number Logic"
     Allow user to customize which fields to display or hide.
-    Allow user to apply number logic and wild card operators.
+    Allow user to apply number logic and wild card operators to filter fields
 
 - Delete from unlocked compendium
     Allow user to lock/unlock packs (compendiums) 
     Allow user to delete items from unlocked compendium.
-    Add button to delete #[CF_tempEntity] items.
+    DONE!!! Add button to delete #[CF_tempEntity] items.
 
 - Remember scroll bar position
     On render, remember scroll positions of each column (Update panel sure would be nice)
