@@ -298,7 +298,7 @@ export class CompendiumNavigator extends FormApplication {
                 }
             }
             catch (e) {
-                console.log("Compnav | " + prop + "." + ckey + " - Error Message: " + e);
+                //console.log("Compnav | " + prop + "." + ckey + " - Error Message: " + e);
             }
             //}
         }
@@ -314,7 +314,7 @@ export class CompendiumNavigator extends FormApplication {
                 this._filter_selections = {};
                 this._filter_results = [];
                 this._filter_selections.type = this._class_types_selected[0];
-                let data_keys = Object.keys(formData).filter(data => data !== "hdn_Selected_Items" && formData[data] != null && formData[data] !== false && formData[data] !== "")
+                let data_keys = Object.keys(formData).filter(data => data !== "hdn_Selected_Items" && data !== "compnav_weighted_by" && formData[data] != null && formData[data] !== false && formData[data] !== "")
                 for (const key of data_keys) {
                     this._filter_selections[key] = formData[key];
                 }
@@ -322,7 +322,7 @@ export class CompendiumNavigator extends FormApplication {
 
                 let index = null;
                 for (const _gpk of this._game_pack_keys_selected) {
-                    index = await game.packs.get(_gpk).getIndex({ fields: ["img", "data"] });
+                    index = await game.packs.get(_gpk).getIndex({ fields: ["value", "system", "data"] });
                     //console.log(index);
                     this._filter_results = this._filter_results.concat(this.filterData(_gpk, index, this._filter_selections))
                 }
@@ -349,7 +349,8 @@ export class CompendiumNavigator extends FormApplication {
                         _id: item._id,
                         gpk: item.gpk,
                         img: item.img,
-                        name:item.name
+                        name:item.name,
+                        rarity:item.rarity
                     });
                 }
                 this._selected_items_json = JSON.stringify(this._selected_items, null, 2);
@@ -368,6 +369,14 @@ export class CompendiumNavigator extends FormApplication {
                     _items_obj = JSON.parse(_Items);
                 }
 
+                const flat_rarity = _items_obj.every(val => val.rarity === _items_obj[0].rarity);// Are all rarities the same?
+                console.log("flat_rarity = " + flat_rarity)
+                let rarity_weight = {"common":64, 
+                                     "uncommon":20 ,     
+                                     "rare":10,
+                                     "veryRare":5,
+                                     "legendary":1};
+                
                 let r = 0;
                 if (_items_obj.length > 0) {
                     _items_obj = _items_obj.map(i => {
@@ -377,8 +386,10 @@ export class CompendiumNavigator extends FormApplication {
                             text: i.name,
                             img: i.img,
                             collection: i.gpk,
-                            weight: 1,
+                            weight: (!flat_rarity && i.rarity !== undefined && i.rarity !== "" ? rarity_weight[i.rarity] : 1),
                             range: [r, r],
+                            type: CONST.TABLE_RESULT_TYPES.COMPENDIUM,
+
                         }
                     });
 
@@ -389,7 +400,7 @@ export class CompendiumNavigator extends FormApplication {
                         results: _items_obj,
                         replacement: true,
                         formula: `1d${_items_obj.length}`,
-                        folder: game.folders.getName("WIP").id,
+                        //folder: game.folders.getName("WIP").id,
                     });
                     await roll_Table.normalize();
                 }

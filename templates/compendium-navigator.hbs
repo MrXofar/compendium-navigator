@@ -171,7 +171,7 @@
             const item_button = await document.getElementById(event.target.id).parentElement.parentElement;
             let pack = await game.packs.get(item_button.dataset.game_pack_key);
             let item = await pack.getDocument(item_button.dataset.document_id);
-            //console.log(item);
+            console.log(item);
 
             if(selected_items_obj.filter(x => x._id === item._id).length === 0)
             {
@@ -179,7 +179,8 @@
                     _id: item._id,
                     gpk: item.compendium.collection,
                     img: item.img,
-                    name: item.name
+                    name: item.name,
+                    rarity: item.system.rarity
                 });    
 
                 let hdn_Selected_Items = document.getElementById("hdn_Selected_Items");
@@ -338,12 +339,22 @@
                 <div class="compnav-form-fields">
                     <input type="text" name="compnav_name" data-dtype="String">
                 </div>
-            </div>
-            <p>
+            </div> 
+            {{!-- <div class="compnav-form-group">
+                <label><span>Weighted by</span></label>
+                <div class="compnav-form-fields">
+                    <select name="compnav_weighted_by">
+                        <option value="0">Rarity</option>
+                        <option value="1">Price</option>
+                        <option value="2">Level</option>
+                    </select>
+                </div>
+            </div> --}}
+            {{!-- <p>
                 <button type="submit" id="compnav_create_compendium">
                     <i class="fa fa-book-atlas"></i>Create Compendium
                 </button>
-            </p>
+            </p> --}}
             <p>
                 <button onclick="CreateRollTable(event);">
                     <i class="fa fa-table-list"></i>Create Rollable Table
