@@ -27,23 +27,23 @@ export class CompendiumNavigator extends FormApplication {
     
     _obj_relationships = [];
     
-    _field_list = [];
+    //_field_list = [];
 
     constructor() {
         super();
         this.GetGamePackNames();
         
-        switch(game.system){
-            case"dnd5e":
-                this._field_list = ["system"];
-                break;
-            case"dcc":
-                this._field_list = ["value", "system", "data"];
-                break;
-            default:
-                this._field_list = ["value", "system"];
-
-        }
+        //switch(game.system){
+        //    case"dnd5e":
+        //        this._field_list = ["system"];
+        //        break;
+        //    case"dcc":
+        //        this._field_list = ["value", "system", "data"];
+        //        break;
+        //    default:
+        //        this._field_list = ["value", "system"];
+        //
+        //}
     }
 
     static get defaultOptions() {
@@ -230,7 +230,8 @@ export class CompendiumNavigator extends FormApplication {
         if (!this._mapped_fields.find(x => x.class_type === class_type)) {
             this._document_index_keys = {};
             for (const _gpk of this._game_pack_keys_selected) {
-                index = await game.packs.get(_gpk).getIndex({ fields: this._field_list });
+                //index = await game.packs.get(_gpk).getIndex({ fields: this._field_list });
+                index = await game.packs.get(_gpk).getIndex({ fields: ["value", "system", "data"] });
                 //console.log(index);
                 this.GetFields(index);
             }
@@ -341,7 +342,8 @@ export class CompendiumNavigator extends FormApplication {
 
                 let index = null;
                 for (const _gpk of this._game_pack_keys_selected) {
-                    index = await game.packs.get(_gpk).getIndex({ fields: this._field_list });
+                    //index = await game.packs.get(_gpk).getIndex({ fields: this._field_list });
+                    index = await game.packs.get(_gpk).getIndex({ fields: ["value", "system", "data"] });
                     this._filter_results = this._filter_results.concat(this.filterData(_gpk, index, this._filter_selections))
                 }
                 break;
