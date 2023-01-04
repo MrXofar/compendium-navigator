@@ -184,6 +184,10 @@
     padding-right: 5px;
     font-size: 0.8em;
   }
+  .compnav-filter-childless-label{    
+    font-size: 1em;
+    border-bottom: 1px solid
+  }
   .compnav-field-filter::placeholder,
   .compnav-filter-name::placeholder{
     font-weight: normal !important;

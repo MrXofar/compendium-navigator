@@ -18,16 +18,32 @@ export class CompendiumNavigator extends FormApplication {
     _game_pack_keys_selected = [];
     _class_type_x_game_pack_key = [];
     _document_index_keys = {};
-    _filter_fields_json = [];
+    _filter_fields_json = "";
     _mapped_fields = [];
     _filter_selections = {};
     _filter_results = [];
-    _selected_items_json = [];
+    _selected_items_json = "";
     _selected_items = [];
+    
+    _obj_relationships = [];
+    
+    _field_list = [];
 
     constructor() {
         super();
         this.GetGamePackNames();
+        
+        switch(game.system){
+            case"dnd5e":
+                this._field_list = ["system"];
+                break;
+            case"dcc":
+                this._field_list = ["value", "system", "data"];
+                break;
+            default:
+                this._field_list = ["value", "system"];
+
+        }
     }
 
     static get defaultOptions() {
@@ -75,7 +91,7 @@ export class CompendiumNavigator extends FormApplication {
                 event.target.classList.add("compnav-doc-class-selected");
                 this._class_types_selected = [];
                 this._game_pack_keys_selected = [];
-                this._filter_fields_json = [];
+                this._filter_fields_json = "";
                 this._filter_results = [];
                 this._selected_items_json = [];
                 this._selected_items = [];
@@ -147,6 +163,7 @@ export class CompendiumNavigator extends FormApplication {
                     // Cache which packs contain which item types.
                     if (this._class_type_x_game_pack_key.filter(x => x.class_type === item.type && x.game_pack_key === _gpk).length === 0) {
                         this._class_type_x_game_pack_key.push({
+                            doc_class: pack.documentName,
                             class_type: item.type,
                             game_pack_key: _gpk
                         });
@@ -154,40 +171,51 @@ export class CompendiumNavigator extends FormApplication {
                 }
             }
         }
-        //console.log(this._class_type_x_game_pack_key); 
+        if(this._class_types.length === 0){
+            console.log("need to show packs anyway")
+            this.SelectGamePacks(); 
+        }
+        console.log(this._class_type_x_game_pack_key); 
         this.render();
     }
 
-    async SelectGamePacks(class_type) {//class_type
+    async SelectGamePacks(class_type) {//Game packs shown are selected by default
         const packs = await game.packs.filter((p) => p.documentName === this._doc_class_selected);
-        this._game_pack_keys_selected = [];  // There can be only one! ... for now,... until there can be more.      
+        console.log(packs);
+        this._game_pack_keys_selected = [];      
         for (const pack of packs) {
             let _gpk = pack.collection;
 
-            // Look in cached _class_type_x_game_pack_key first
-            if (this._class_type_x_game_pack_key.filter(x => this._class_types_selected.includes(x.class_type)).length > 0) {
-                let gpk_cache = this._class_type_x_game_pack_key.filter(x => this._class_types_selected.includes(x.class_type) &&
-                    !this._game_pack_keys_selected.includes(x.game_pack_key)).map(y => y.game_pack_key);
-                this._game_pack_keys_selected = this._game_pack_keys_selected.concat(gpk_cache);
+            if(this._class_types.length === 0){                
+                this._game_pack_keys_selected.push(_gpk);
+                console.log(this._game_pack_keys_selected);
             }
-            else {
-                // Dig through each item of game pack to select game packs with selected class_type 
-                for (const item of pack.index) {
-                    if (this._class_types_selected.includes(item.type) && !this._game_pack_keys_selected.includes(_gpk)) {
-                        this._game_pack_keys_selected.push(_gpk);
+            else{
+                // Look in cached _class_type_x_game_pack_key first
+                if (this._class_type_x_game_pack_key.filter(x => this._class_types_selected.includes(x.class_type)).length > 0) {
+                    let gpk_cache = this._class_type_x_game_pack_key.filter(x => this._class_types_selected.includes(x.class_type) &&
+                        !this._game_pack_keys_selected.includes(x.game_pack_key)).map(y => y.game_pack_key);
+                    this._game_pack_keys_selected = this._game_pack_keys_selected.concat(gpk_cache);
+                }
+                else {
+                    // Dig through each item of game pack to select game packs with selected class_type 
+                    for (const item of pack.index) {
+                        if (this._class_types_selected.includes(item.type) && !this._game_pack_keys_selected.includes(_gpk)) {
+                            this._game_pack_keys_selected.push(_gpk);
+                        }
+                        // else if(class_type === item.type){
+                        //     // Some packs have multiple types - When one of those types is deselected,
+                        //     // we want the game pack to remain selected if any of its other types are   
+                        //     // still selected.
+                        //     // this._class_type_x_game_pack_key keeps track of which packs contain which item types.
+                        //     let _xw_game_pack = this._class_type_x_game_pack_key.filter(x => x.game_pack_key === _gpk);
+                        //     let _xw_items = _xw_game_pack.map(function(x){ return x.class_type;});
+                        //     if(_xw_items.filter(_xw_item => this._class_types_selected.includes(_xw_item)).length === 0)
+                        //     {
+                        //         this._game_pack_keys_selected = this._game_pack_keys_selected.filter(function(x) { return x != _gpk; });
+                        //     }
+                        // }
                     }
-                    // else if(class_type === item.type){
-                    //     // Some packs have multiple types - When one of those types is deselected,
-                    //     // we want the game pack to remain selected if any of its other types are   
-                    //     // still selected.
-                    //     // this._class_type_x_game_pack_key keeps track of which packs contain which item types.
-                    //     let _xw_game_pack = this._class_type_x_game_pack_key.filter(x => x.game_pack_key === _gpk);
-                    //     let _xw_items = _xw_game_pack.map(function(x){ return x.class_type;});
-                    //     if(_xw_items.filter(_xw_item => this._class_types_selected.includes(_xw_item)).length === 0)
-                    //     {
-                    //         this._game_pack_keys_selected = this._game_pack_keys_selected.filter(function(x) { return x != _gpk; });
-                    //     }
-                    // }
                 }
             }
         }
@@ -202,16 +230,16 @@ export class CompendiumNavigator extends FormApplication {
         if (!this._mapped_fields.find(x => x.class_type === class_type)) {
             this._document_index_keys = {};
             for (const _gpk of this._game_pack_keys_selected) {
-                index = await game.packs.get(_gpk).getIndex({ fields: ["value", "system", "data"] });
+                index = await game.packs.get(_gpk).getIndex({ fields: this._field_list });
                 //console.log(index);
                 this.GetFields(index);
             }
-            console.log(this._document_index_keys);
-            // TODO: Attempt to sort so that all children properties are under their Parent property
+            //console.log(this._document_index_keys);   
 
             this._filter_fields_json = JSON.stringify(this._document_index_keys, null, 2);
-            console.log(this._filter_fields_json)
-
+            
+            //console.log(this._filter_fields_json)
+            
             // Cache mapped fields
             this._mapped_fields.push({
                 class_type: class_type,
@@ -266,50 +294,30 @@ export class CompendiumNavigator extends FormApplication {
         let child_properties = null;
         if (getProperty(item, prop) != null) {
             child_properties = Object.keys(getProperty(item, prop));
-            //console.log("child_properties of..." + prop);
-            //console.log(getProperty(item, prop));
-            //console.log("are...");
-            //console.log(child_properties);
-        } //else { console.log(prop + " is null"); }
+        } 
 
         for (const ckey of child_properties) {
 
-            //console.log("value of " + ckey + " is " + getProperty(item,prop)[ckey]);
-            //if (!Array.isArray(getProperty(item, prop)[ckey])) { // Skipping arrays for now.
             try {
                 if (getProperty(item, prop)[ckey] != null
                     && typeof (getProperty(item, prop)[ckey]) === 'object'
                     && Object.keys(getProperty(item, prop)[ckey]).length > 0) {
-
-                    //console.log(">> Getting child fields for... " + prop + "." + ckey);
-                    //if (getProperty(this._document_index_keys,prop + "." + ckey) === undefined){console.log("and _document_index_keys." + prop + "." + ckey + " is undefined...");}
                     if (getProperty(this._document_index_keys, prop)[ckey] === undefined) {
                         getProperty(this._document_index_keys, prop)[ckey] = {};
                     }
                     this.GetChildFields(item, prop + "." + ckey);
-                    //console.log(">>");
 
                 } else if (getProperty(item, prop)[ckey] != null) {
-                    //console.log("> " + prop + "." + ckey + " is a childless top level property.");
-                    //if (getProperty(this._document_index_keys,prop + "." + ckey)  === undefined){console.log("and _document_index_keys." + prop + "." + ckey + " is undefined");}
                     if (getProperty(this._document_index_keys, prop)[ckey] === undefined) { 
-                        //console.log("Setting typeof value for " + prop + "." + ckey);
-                        //console.log(prop + "." + ckey + " is typeof " + getProperty(item, prop)[ckey]);
                         if(!Array.isArray(getProperty(item, prop)[ckey])){
-                            //console.log(typeof (getProperty(item, prop)[ckey]));
                             getProperty(this._document_index_keys, prop)[ckey] = typeof (getProperty(item, prop)[ckey]);
                         } 
-                        // else{                           
-                        //     getProperty(this._document_index_keys, prop)[ckey] = "array(" + getProperty(item, prop + "." + ckey) + ")";
-                        // }
                     }
-                    //console.log(">");
                 }
             }
             catch (e) {
                 //console.log("Compnav | " + prop + "." + ckey + " - Error Message: " + e);
             }
-            //}
         }
         //console.log(">>> GetChildFields END >>> ");        
     }
@@ -322,7 +330,9 @@ export class CompendiumNavigator extends FormApplication {
             case "submit":
                 this._filter_selections = {};
                 this._filter_results = [];
-                this._filter_selections.type = this._class_types_selected[0];
+                if(this._class_types_selected[0] !== undefined){
+                    this._filter_selections.type = this._class_types_selected[0];
+                }
                 let data_keys = Object.keys(formData).filter(data => data !== "hdn_Selected_Items" && data !== "compnav_weighted_by" && formData[data] != null && formData[data] !== false && formData[data] !== "")
                 for (const key of data_keys) {
                     this._filter_selections[key] = formData[key];
@@ -331,8 +341,7 @@ export class CompendiumNavigator extends FormApplication {
 
                 let index = null;
                 for (const _gpk of this._game_pack_keys_selected) {
-                    index = await game.packs.get(_gpk).getIndex({ fields: ["value", "system", "data"] });
-                    //console.log(index);
+                    index = await game.packs.get(_gpk).getIndex({ fields: this._field_list });
                     this._filter_results = this._filter_results.concat(this.filterData(_gpk, index, this._filter_selections))
                 }
                 break;
@@ -345,7 +354,7 @@ export class CompendiumNavigator extends FormApplication {
                 this._filter_results = [];
                 break;
             case "clear_selections":
-                this._selected_items_json = [];
+                this._selected_items_json = "";
                 this._selected_items = [];
                 break;
             case "select_item":

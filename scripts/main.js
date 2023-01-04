@@ -19,17 +19,17 @@ Hooks.once("init", () => {
 // });
 
 Hooks.on('renderCompendiumDirectory', (app, html, data) => {
-	if (game.user.isGM) {
-		const cbButton = $(`<button class="compendium-browser-btn"><i class="fa fa-dharmachakra"></i> ${game.i18n.localize("CompNav.dialog.compnav-button")}</button>`);
+	//if (game.user.isGM) {
+		const cbButton = $(`<button><i class="fa fa-dharmachakra"></i> ${game.i18n.localize("CompNav.dialog.compnav-button")}</button>`);
 		//html.find(".header-search ").remove();
-		html.find('.directory-header').append(cbButton);
+		html.find('.header-actions').append(cbButton);
 
 		// Handle button clicks
 		cbButton.click(ev => {
 			ev.preventDefault();
 			FormApp_CompendiumNavigator();
 		});
-	}
+	//}
 });
 
 // async function VersionUpdateValidation() {

@@ -15,6 +15,7 @@
             FillBubble(game_pack_keys_selected, "compnav_game_pack_name_", "compnav-game-pack-name-selected");
 
             let filter_fields_json = compnav_form_container.dataset.filter_fields_json;
+            //console.log(filter_fields_json);
             let filter_fields_obj = null;
             if (filter_fields_json !== "") {
                 filter_fields_obj = JSON.parse(filter_fields_json);
@@ -34,35 +35,39 @@
 
             this.BuildFilterControls(filter_selections, filter_fields_obj);
         }
+
         // The parent_filter_container wasn't working out, but I still want to be able to group items in the same container
         // so just leaving it commented out for now until I can get back to it.
         function BuildFilterControls(filter_selections, filter_fields_obj, is_child, root = "") {
             for (let key in filter_fields_obj) {
                 let value = filter_fields_obj[key];
                 if (filter_fields_obj.hasOwnProperty(key)) {
+
                     let field_label = document.createElement("label");
-                    if (is_child && typeof (value) !== "object") { field_label.classList.add("compnav-filter-child-label"); }
+                    if (is_child && typeof (value) !== "object") {
+                        if(root.split(".").length - 1 > 1){
+                            field_label.classList.add("compnav-filter-child-label"); 
+                        } else{
+                            field_label.classList.add("compnav-filter-childless-label");
+                        }
+                    }
 
                     let field_span = document.createElement("span");
                     field_span.textContent = (!is_child ? "" : "." ) + key;
                     field_label.appendChild(field_span);
+                    let field_control = null;
                     let h3 = null;
                     if (!is_child || typeof (value) === "object") { 
                         h3 = document.createElement("h3");
                         h3.appendChild(field_label);
-                    }
+                        field_control = h3;
+                    }else{ field_control = field_label}
 
                     let filter_container = null;
-                    //if(!parent_filter_container){
                     filter_container = document.createElement("div");
                     filter_container.classList.add("compnav-form-group");
-                    filter_container.appendChild(h3 !== null ? h3 : field_label);
-                    //}
-                    //else{
-                    //    //let br = document.createElement("br");
-                    //    //parent_filter_container.appendChild(br);
-                    //    parent_filter_container.appendChild(field_label);
-                    //}
+                    filter_container.appendChild(field_control);
+                    
                     let data_root_key = root + key
                     if (typeof (value) !== "object") {
                         let field_container = document.createElement("div");
@@ -103,28 +108,15 @@
 
                         field_filter.setAttribute("name", data_root_key);
                         field_container.appendChild(field_filter)
-
-                        //if (!parent_filter_container) {
                         filter_container.setAttribute("title", data_root_key);
                         filter_container.appendChild(field_container);
                         div_compnav_fields.appendChild(filter_container);
-                        //} 
-                        //else {
-                        //    parent_filter_container.appendChild(field_container);
-                        //    div_compnav_fields.appendChild(parent_filter_container);
-                        //}
                     }
                     else {
-                        if (Object.keys(value).length > 0) {                    
-                            //if (!parent_filter_container) {
+                        if (Object.keys(value).length > 0) {    
                             filter_container.setAttribute("title", data_root_key);
                             div_compnav_fields.appendChild(filter_container);
                             BuildFilterControls(filter_selections, filter_fields_obj[key], true, root + key + ".");
-                            //} 
-                            //else {
-                            //    div_compnav_fields.appendChild(parent_filter_container);
-                            //    BuildFilterControls(filter_fields_obj[key], parent_filter_container, root + key + ".");
-                            //}
                         }
                     }
                 }
@@ -294,7 +286,7 @@
             <div id="div_compnav_game_packs" class="compnav-form-filter">
                 <p class="compnav-filter-bubble-container">
                     {{#each game_pack_names as |game_pack_names id|}}
-                    <span id="compnav_game_pack_name_{{id}}" title={{id}}
+                    <span id="compnav_game_pack_name_{{id}}" title="{{id}} (click to deselect pack)"
                         class="compnav-game-pack-name compnav-display-none">{{game_pack_names}}</span>
                     {{/each}}
                 </p>
