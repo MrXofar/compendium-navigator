@@ -1,5 +1,9 @@
+v0.0.5 - x/x/2023 (WORKING BUT NOT RELEASED)
+----------------------------------------------
+- Improved control alignment for Results and Selected columns
 
-v0.0.3 - 1/3/2023
+
+v0.0.3-4 - 1/3/2023
 ----------------------------------------------
 
 Not much changed really. Just opening module to players.

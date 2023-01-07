@@ -298,12 +298,12 @@
             </div>
             <div>
                 <p>
-                    <button type="submit" id="submit">
+                    <button class="compnav-button" type="submit" id="submit">
                         <i class="fa fa-filter"></i>Filter
                     </button>
                 </p>
                 <p>
-                    <button type="submit" id="reset_filters">
+                    <button class="compnav-button" type="submit" id="reset_filters">
                         <i class="fa fa-arrow-rotate-left"></i>Reset Fields
                     </button>
                 </p>
@@ -321,7 +321,7 @@
             <h3>Results</h3>
             <div>
                 <p>
-                    <button onclick="SelectAll(event);">
+                    <button class="compnav-button" onclick="SelectAll(event);">
                         <i class="fa fa-angle-double-right"></i>Select All
                     </button>
                 </p>
@@ -331,7 +331,7 @@
                     </button>
                 </p> --}}
                 <p>
-                    <button type="submit" id="clear_results">
+                    <button class="compnav-button" type="submit" id="clear_results">
                         <i class="fa fa-arrow-rotate-left"></i>Clear Results
                     </button>
                 </p>
@@ -370,12 +370,9 @@
 
         <div id="Selected_Item_Drop_Zone" class="compnav-form-column compnav-form-col-border">
             <h3>Selected</h3>   
-            <div class="compnav-form-group">
+            {{!-- <div class="compnav-form-group">
                 <label><span>Name</span></label>
-                <div class="compnav-form-fields">
-                    <input type="text" name="compnav_name" placeholder="New Rollable Table" data-dtype="String">
-                </div>
-            </div> 
+            </div> --}} 
             {{!-- <div class="compnav-form-group">
                 <label><span>Weighted by</span></label>
                 <div class="compnav-form-fields">
@@ -393,15 +390,16 @@
             </p> --}}
             <div>
                 <p>
-                    <button onclick="CreateRollTable(event);">
+                </p>
+                <div class="compnav-form-fields">
+                    <input type="text" name="compnav_name" placeholder="Rollable Table Name" data-dtype="String" style="margin-right: 8px;">
+                    <button class="compnav-button" onclick="CreateRollTable(event);">
                         <i class="fa fa-table-list"></i>Create Rollable Table
                     </button>
-                </p>
-                <p>
-                    <button type="submit" id="clear_selections">
+                </div>
+                    <button  class="compnav-button"type="submit" id="clear_selections" style="margin-top: 8px;margin-bottom: 8px;">
                         <i class="fa fa-arrow-rotate-left"></i>Clear Selections
                     </button>
-                </p>
                 </div>
             <div class="compnav-flex-scrollable">            
                 <input id="hdn_Selected_Items" type="hidden" name="hdn_Selected_Items" value=""></hidden>
