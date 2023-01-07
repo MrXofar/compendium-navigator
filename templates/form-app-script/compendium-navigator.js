@@ -53,7 +53,7 @@ export class CompendiumNavigator extends FormApplication {
             id: 'compendium-navigator',
             template: "./modules/compendium-navigator/templates/compendium-navigator.hbs",
             width: 1200,
-            height: 900,
+            height: 800,
             closeOnSubmit: false,
             submitOnClose: false
         });

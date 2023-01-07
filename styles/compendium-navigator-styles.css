@@ -97,7 +97,7 @@
     flex-wrap: nowrap;
     padding: 5px 5px 5px 5px;    
     display:flex;
-    height:850px;
+    height:745px;
     flex-direction: column;
   }
   .compnav-form-filter-column {
